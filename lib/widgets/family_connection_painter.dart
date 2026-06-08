@@ -7,10 +7,14 @@ class FamilyConnectionPainter extends CustomPainter {
   const FamilyConnectionPainter({
     required this.nodes,
     required this.connections,
+    required this.connectorColor,
+    required this.endpointColor,
   });
 
   final List<FamilyTreeNode> nodes;
   final List<FamilyConnection> connections;
+  final Color connectorColor;
+  final Color endpointColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -24,24 +28,16 @@ class FamilyConnectionPainter extends CustomPainter {
       final anchors = _anchorsFor(from, to);
       final path = _connectorPath(anchors.start, anchors.end);
 
-      final shadowPaint = Paint()
-        ..color = Colors.white.withValues(alpha: .85)
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = connection.strokeWidth + 4;
-
       final linePaint = Paint()
-        ..color = connection.color
+        ..color = connectorColor
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = connection.strokeWidth;
+        ..strokeWidth = 1.4;
 
-      canvas.drawPath(path, shadowPaint);
-      canvas.drawPath(path, linePaint);
-      _drawEndpoint(canvas, anchors.start, connection.color);
-      _drawEndpoint(canvas, anchors.end, connection.color);
+      _drawDashedPath(canvas, path, linePaint);
+      _drawEndpoint(canvas, anchors.start);
+      _drawEndpoint(canvas, anchors.end);
     }
   }
 
@@ -58,14 +54,14 @@ class FamilyConnectionPainter extends CustomPainter {
 
     if (toRect.center.dy > fromRect.center.dy) {
       return _ConnectionAnchors(
-        Offset(fromRect.center.dx, fromRect.bottom),
-        Offset(toRect.center.dx, toRect.top),
+        Offset(fromRect.center.dx, _bodyBottomFor(from)),
+        Offset(toRect.center.dx, _bodyTopFor(to)),
       );
     }
 
     return _ConnectionAnchors(
-      Offset(fromRect.center.dx, fromRect.top),
-      Offset(toRect.center.dx, toRect.bottom),
+      Offset(fromRect.center.dx, _bodyTopFor(from)),
+      Offset(toRect.center.dx, _bodyBottomFor(to)),
     );
   }
 
@@ -102,26 +98,63 @@ class FamilyConnectionPainter extends CustomPainter {
     );
   }
 
-  void _drawEndpoint(Canvas canvas, Offset center, Color color) {
+  double _bodyTopFor(FamilyTreeNode node) {
+    return node.position.dy + FamilyMemberCard.bodyTopInsetFor(node);
+  }
+
+  double _bodyBottomFor(FamilyTreeNode node) {
+    final cardSize = node.isMainUser
+        ? FamilyMemberCard.mainSize
+        : FamilyMemberCard.regularSize;
+    return node.position.dy + cardSize.height;
+  }
+
+  void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
+    const dashLength = 5.0;
+    const gapLength = 6.0;
+
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = distance + dashLength > metric.length
+            ? metric.length
+            : distance + dashLength;
+        canvas.drawPath(metric.extractPath(distance, next), paint);
+        distance += dashLength + gapLength;
+      }
+    }
+  }
+
+  void _drawEndpoint(Canvas canvas, Offset center) {
     canvas.drawCircle(
       center,
       4,
       Paint()
-        ..color = Colors.white
+        ..color = endpointColor.withValues(alpha: .18)
         ..style = PaintingStyle.fill,
     );
     canvas.drawCircle(
       center,
-      3,
+      2.8,
       Paint()
-        ..color = color
+        ..color = endpointColor
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawCircle(
+      center,
+      2,
+      Paint()
+        ..color = Colors.white.withValues(alpha: .92)
         ..style = PaintingStyle.fill,
     );
   }
 
   @override
   bool shouldRepaint(covariant FamilyConnectionPainter oldDelegate) {
-    return oldDelegate.nodes != nodes || oldDelegate.connections != connections;
+    return oldDelegate.nodes != nodes ||
+        oldDelegate.connections != connections ||
+        oldDelegate.connectorColor != connectorColor ||
+        oldDelegate.endpointColor != endpointColor;
   }
 }
 

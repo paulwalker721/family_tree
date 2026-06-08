@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'data/sample_family_tree_data.dart';
 import 'models/add_family_member_result.dart';
 import 'models/family_tree_node.dart';
+import 'theme/presentation/app_theme/theme_context_extensions.dart';
 import 'widgets/add_family_member_dialog.dart';
 import 'widgets/family_member_card.dart';
 import 'widgets/family_tree_canvas.dart';
@@ -45,7 +46,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFEAF2F1),
+      backgroundColor: context.appColors.sheetBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [

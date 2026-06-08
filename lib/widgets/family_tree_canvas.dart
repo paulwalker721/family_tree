@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/family_tree_node.dart';
+import '../theme/presentation/app_theme/theme_context_extensions.dart';
 import 'family_connection_painter.dart';
 import 'family_member_card.dart';
 
@@ -24,6 +25,8 @@ class FamilyTreeCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return InteractiveViewer(
       transformationController: transformationController,
       boundaryMargin: const EdgeInsets.all(420),
@@ -41,6 +44,8 @@ class FamilyTreeCanvas extends StatelessWidget {
                 painter: FamilyConnectionPainter(
                   nodes: nodes,
                   connections: connections,
+                  connectorColor: colors.dividerColor,
+                  endpointColor: colors.primary,
                 ),
               ),
             ),

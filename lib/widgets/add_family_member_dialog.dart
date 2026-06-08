@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/add_family_member_result.dart';
 import '../models/family_tree_node.dart';
+import '../theme/presentation/app_theme/theme_context_extensions.dart';
 
 class AddFamilyMemberDialog extends StatefulWidget {
   const AddFamilyMemberDialog({super.key, required this.parent});
@@ -51,10 +52,12 @@ class _AddFamilyMemberDialogState extends State<AddFamilyMemberDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return AlertDialog(
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      backgroundColor: colors.dialogueColor,
+      surfaceTintColor: colors.dialogueColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text('Add relative to ${widget.parent.name}'),
       content: SizedBox(
         width: 420,
@@ -67,9 +70,9 @@ class _AddFamilyMemberDialogState extends State<AddFamilyMemberDialog> {
               children: [
                 Text(
                   'Profile Image',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: const Color(0xFF1D2827),
-                    fontWeight: FontWeight.w800,
+                  style: context.appTextStyles.labelLarge?.copyWith(
+                    color: colors.negativeColor,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -187,6 +190,8 @@ class _AvatarChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return InkWell(
       borderRadius: BorderRadius.circular(28),
       onTap: onPressed,
@@ -196,13 +201,13 @@ class _AvatarChoice extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected ? const Color(0xFF2F7D7E) : Colors.transparent,
+            color: isSelected ? colors.primary : Colors.transparent,
             width: 3,
           ),
         ),
         child: CircleAvatar(
           radius: 24,
-          backgroundColor: const Color(0xFFEAF2F1),
+          backgroundColor: colors.cardBackgroundMedium,
           child: ClipOval(
             child: Image.network(
               imageUrl,
@@ -211,7 +216,7 @@ class _AvatarChoice extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (_, error, stackTrace) => const Icon(
                 Icons.person_rounded,
-                color: Color(0xFF2F7D7E),
+                color: Colors.white,
               ),
             ),
           ),
